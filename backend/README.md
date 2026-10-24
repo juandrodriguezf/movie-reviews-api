@@ -93,6 +93,8 @@ src/
 
 Formato de error en todas las respuestas: `{ "error": "mensaje" }`.
 
+`DELETE /reviews/:id` responde `200` con `{ "message": "Resena eliminada correctamente" }`, de modo que clientes como Retrofit puedan leer el cuerpo de la respuesta.
+
 | Método | Ruta | Descripción | Estado |
 |---|---|---|---|
 | GET | `/users` | Lista de usuarios | Disponible |
@@ -104,7 +106,7 @@ Formato de error en todas las respuestas: `{ "error": "mensaje" }`.
 | POST | `/reviews` | Crea una reseña | Disponible |
 | GET | `/reviews/:id` | Detalle de una reseña | Disponible |
 | PUT | `/reviews/:id` | Actualiza una reseña | Disponible |
-| DELETE | `/reviews/:id` | Elimina una reseña | Disponible |
+| DELETE | `/reviews/:id` | Elimina una reseña y responde `200` con un mensaje | Disponible |
 
 ## Postman
 
