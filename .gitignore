@@ -8,3 +8,7 @@ npm-debug.log*
 .vscode/
 .idea/
 coverage/
+.postman/
+postman/collections/
+postman/environments/
+postman/globals/
