@@ -2,6 +2,16 @@
 
 API REST para reseñas de películas construida con **Express**, **Sequelize** y **PostgreSQL**. Expone usuarios y películas en modo lectura y un CRUD completo de reseñas, cada una asociada a un usuario y a una película.
 
+Incluye un cliente Android en Kotlin + Jetpack Compose que consume la API con Retrofit: [`android/`](android/README.md).
+
+## Estructura
+
+| Ruta | Contenido |
+|---|---|
+| `src/` | Backend Express |
+| `postman/` | Colección y environment de Postman |
+| `android/` | Aplicación Android (Compose) |
+
 ## Stack
 
 | Tecnología | Uso |
