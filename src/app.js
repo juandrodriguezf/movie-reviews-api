@@ -1,13 +1,12 @@
 import express from 'express';
-import morgan from 'morgan';
+import userRoutes from './routes/userRoots.js';
+import articleRoutes from './routes/articles.js';
 
 const app = express();
 
-app.use(morgan('dev'));
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.json({ status: 'ok', service: 'backend-express' });
-});
+app.use(userRoutes);
+app.use(articleRoutes);
 
 export default app;

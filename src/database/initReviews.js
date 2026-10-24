@@ -57,7 +57,7 @@ export async function loadInitialReviews() {
       userId: users[4].id,
       articleId: articles[5].id,
       rating: 5,
-      comment: 'Fantasía y guerra mezcladas con una sensibilidad única.'
+      comment: 'Fantasia y guerra mezcladas con una sensibilidad unica.'
     },
     {
       userId: users[2].id,

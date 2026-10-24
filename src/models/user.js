@@ -8,12 +8,9 @@ export const User = sequelize.define('users', {
     autoIncrement: true
   },
   username: {
-    type: DataTypes.STRING(30),
+    type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
-    validate: {
-      len: [3, 30]
-    }
+    unique: true
   },
   email: {
     type: DataTypes.STRING,
@@ -24,7 +21,7 @@ export const User = sequelize.define('users', {
     }
   },
   name: {
-    type: DataTypes.STRING(80),
+    type: DataTypes.STRING,
     allowNull: false
   },
   avatarUrl: {
