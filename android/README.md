@@ -13,9 +13,12 @@ Cliente Android en Kotlin + Jetpack Compose que consume la API REST de reseñas 
 Desde la raíz del repositorio:
 
 ```bash
+cd backend
 npm install
 npm run def
 ```
+
+La guía completa del backend está en [`../backend/README.md`](../backend/README.md).
 
 ## Abrir la app
 
@@ -31,6 +34,8 @@ npm run def
 - El usuario autenticado se fija en `id = 1`; no se usa Firebase ni se requiere `google-services.json`.
 
 ## Compilar por consola
+
+Desde `android/`:
 
 ```bash
 ./gradlew assembleDebug
