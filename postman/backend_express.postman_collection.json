@@ -1,0 +1,213 @@
+{
+  "info": {
+    "_postman_id": "c1a7e3d2-4b58-4c0f-8e6a-2d9f1b7c5a34",
+    "name": "backend_express",
+    "description": "Pruebas de la API REST de resenas de peliculas (Express + Sequelize + PostgreSQL).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Salud",
+      "item": [
+        {
+          "name": "GET /",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"],
+              "path": []
+            },
+            "description": "Verifica que el servidor este arriba."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "GET /users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Lista todos los usuarios."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /users/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            },
+            "description": "Detalle de un usuario por id."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /users/:id/reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "reviews"]
+            },
+            "description": "Resenas escritas por un usuario."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Articulos",
+      "item": [
+        {
+          "name": "GET /articles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/articles",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles"]
+            },
+            "description": "Lista todas las peliculas."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /articles/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "{{articleId}}"]
+            },
+            "description": "Detalle de una pelicula por id."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /articles/:id/reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "{{articleId}}", "reviews"]
+            },
+            "description": "Resenas de una pelicula, con los datos del autor."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "POST /reviews",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{userId}},\n  \"articleId\": {{articleId}},\n  \"rating\": 5,\n  \"comment\": \"Una pelicula que vale la pena ver.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews"]
+            },
+            "description": "Crea una resena asociada a un usuario y a una pelicula."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /reviews/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "{{reviewId}}"]
+            },
+            "description": "Detalle de una resena."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /reviews/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Me gusto mas la segunda vez.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "{{reviewId}}"]
+            },
+            "description": "Actualiza rating y/o comment de una resena."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /reviews/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "{{reviewId}}"]
+            },
+            "description": "Elimina una resena. Responde 204."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": []
+}
