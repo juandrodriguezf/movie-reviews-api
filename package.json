@@ -1,5 +1,5 @@
 {
-  "name": "backend_express",
+  "name": "movie-reviews-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

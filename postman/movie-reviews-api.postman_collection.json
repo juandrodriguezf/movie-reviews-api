@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "c1a7e3d2-4b58-4c0f-8e6a-2d9f1b7c5a34",
-    "name": "backend_express",
+    "name": "movie-reviews-api",
     "description": "Pruebas de la API REST de resenas de peliculas (Express + Sequelize + PostgreSQL).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },

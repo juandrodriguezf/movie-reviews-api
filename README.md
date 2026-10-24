@@ -1,4 +1,4 @@
-# backend_express
+# movie-reviews-api
 
 API REST para reseñas de películas construida con **Express**, **Sequelize** y **PostgreSQL**. Expone usuarios y películas en modo lectura y un CRUD completo de reseñas, cada una asociada a un usuario y a una película.
 
@@ -23,7 +23,7 @@ API REST para reseñas de películas construida con **Express**, **Sequelize** y
 
 ```bash
 git clone <url-del-repositorio>
-cd backend_express
+cd movie-reviews-api
 npm install
 ```
 
@@ -99,7 +99,7 @@ Formato de error en todas las respuestas: `{ "error": "mensaje" }`.
 En `postman/` están la colección y el environment:
 
 1. Postman → **Import** → seleccionar los dos archivos.
-2. Elegir el environment **backend_express - local**.
+2. Elegir el environment **movie-reviews-api - local**.
 3. Ajustar `userId`, `articleId` y `reviewId` según los datos creados.
 
 `baseUrl` apunta a `http://localhost:3000`.
