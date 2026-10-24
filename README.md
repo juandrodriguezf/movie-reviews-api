@@ -85,14 +85,14 @@ Formato de error en todas las respuestas: `{ "error": "mensaje" }`.
 |---|---|---|---|
 | GET | `/users` | Lista de usuarios | Disponible |
 | GET | `/users/:id` | Usuario por id | Disponible |
-| GET | `/users/:id/reviews` | Reseñas de un usuario | Pendiente |
+| GET | `/users/:id/reviews` | Reseñas de un usuario | Disponible |
 | GET | `/articles` | Lista de películas | Disponible |
 | GET | `/articles/:id` | Detalle de una película | Disponible |
-| GET | `/articles/:id/reviews` | Reseñas de una película | Pendiente |
-| POST | `/reviews` | Crea una reseña | Pendiente |
-| GET | `/reviews/:id` | Detalle de una reseña | Pendiente |
-| PUT | `/reviews/:id` | Actualiza una reseña | Pendiente |
-| DELETE | `/reviews/:id` | Elimina una reseña | Pendiente |
+| GET | `/articles/:id/reviews` | Reseñas de una película | Disponible |
+| POST | `/reviews` | Crea una reseña | Disponible |
+| GET | `/reviews/:id` | Detalle de una reseña | Disponible |
+| PUT | `/reviews/:id` | Actualiza una reseña | Disponible |
+| DELETE | `/reviews/:id` | Elimina una reseña | Disponible |
 
 ## Postman
 
@@ -106,4 +106,4 @@ En `postman/` están la colección y el environment:
 
 ## Estado del proyecto
 
-Lecturas de usuarios y películas funcionando. Pendiente: CRUD de reseñas y sus dos consultas por usuario y por película.
+API completa: lecturas de usuarios y películas, CRUD de reseñas y consultas de reseñas por usuario y por película.
