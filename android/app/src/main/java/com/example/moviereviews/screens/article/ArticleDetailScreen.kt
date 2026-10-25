@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,9 +30,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,10 +45,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.moviereviews.data.model.ArticleInfo
 import com.example.moviereviews.data.model.ReviewInfo
+import com.example.moviereviews.utils.Constants
 import java.util.Locale
 
 private val StarColor = Color(0xFFF5A623)
@@ -53,9 +61,49 @@ private val StarColor = Color(0xFFF5A623)
 fun ArticleDetailScreen(
     onBack: () -> Unit,
     onUserClick: (Int) -> Unit,
+    onWriteReview: (Int) -> Unit,
+    onEditReview: (Int, Int) -> Unit,
     viewModel: ArticleDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var reviewToDelete by remember { mutableStateOf<ReviewInfo?>(null) }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.loadArticle(
+            showLoading = viewModel.uiState.value.article == null
+        )
+    }
+
+    reviewToDelete?.let { review ->
+        AlertDialog(
+            onDismissRequest = {
+                if (!uiState.isDeleting) {
+                    reviewToDelete = null
+                }
+            },
+            title = { Text("Eliminar resena") },
+            text = { Text("Esta accion no se puede deshacer.") },
+            confirmButton = {
+                TextButton(
+                    enabled = !uiState.isDeleting,
+                    onClick = {
+                        reviewToDelete = null
+                        viewModel.deleteReview(review.id)
+                    }
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = !uiState.isDeleting,
+                    onClick = { reviewToDelete = null }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -87,7 +135,11 @@ fun ArticleDetailScreen(
                 article = article,
                 reviews = uiState.reviews,
                 reviewsError = uiState.reviewsError,
+                actionError = uiState.actionError,
                 onUserClick = onUserClick,
+                onWriteReview = { onWriteReview(article.id) },
+                onEditReview = { review -> onEditReview(article.id, review.id) },
+                onDeleteReview = { reviewToDelete = it },
                 modifier = Modifier.padding(innerPadding)
             )
 
@@ -101,9 +153,17 @@ private fun ArticleContent(
     article: ArticleInfo,
     reviews: List<ReviewInfo>,
     reviewsError: String?,
+    actionError: String?,
     onUserClick: (Int) -> Unit,
+    onWriteReview: () -> Unit,
+    onEditReview: (ReviewInfo) -> Unit,
+    onDeleteReview: (ReviewInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val ownReview = reviews.firstOrNull {
+        it.user?.id == Constants.CURRENT_USER_ID
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp)
@@ -168,6 +228,27 @@ private fun ArticleContent(
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
+
+                if (ownReview == null) {
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Button(
+                        onClick = onWriteReview,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Escribir resena")
+                    }
+                }
+
+                if (actionError != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = actionError,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
 
@@ -193,7 +274,10 @@ private fun ArticleContent(
             items(reviews, key = { it.id }) { review ->
                 ReviewCard(
                     review = review,
+                    isOwn = ownReview?.id == review.id,
                     onUserClick = onUserClick,
+                    onEdit = { onEditReview(review) },
+                    onDelete = { onDeleteReview(review) },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                 )
             }
@@ -204,7 +288,10 @@ private fun ArticleContent(
 @Composable
 private fun ReviewCard(
     review: ReviewInfo,
+    isOwn: Boolean,
     onUserClick: (Int) -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -270,6 +357,23 @@ private fun ReviewCard(
                     text = review.comment,
                     style = MaterialTheme.typography.bodyMedium
                 )
+
+                if (isOwn) {
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = onEdit) {
+                            Text("Editar")
+                        }
+
+                        TextButton(onClick = onDelete) {
+                            Text("Eliminar")
+                        }
+                    }
+                }
             }
         }
     }

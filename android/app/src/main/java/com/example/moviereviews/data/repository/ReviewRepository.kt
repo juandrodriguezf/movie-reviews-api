@@ -11,6 +11,10 @@ import javax.inject.Inject
 class ReviewRepository @Inject constructor(
     private val remoteDataSource: ReviewRemoteDataSource
 ) {
+    suspend fun getReview(id: Int): Result<ReviewInfo> = apiCall {
+        remoteDataSource.getReview(id).toReviewInfo()
+    }
+
     suspend fun createReview(
         userId: Int,
         articleId: Int,

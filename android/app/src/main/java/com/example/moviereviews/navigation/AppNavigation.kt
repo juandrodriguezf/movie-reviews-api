@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.example.moviereviews.screens.article.ArticleDetailScreen
 import com.example.moviereviews.screens.home.HomeScreen
 import com.example.moviereviews.screens.profile.ProfileScreen
+import com.example.moviereviews.screens.review.ReviewFormScreen
 
 @Composable
 fun AppNavigation(
@@ -42,6 +43,16 @@ fun AppNavigation(
                 onBack = { navController.popBackStack() },
                 onUserClick = { userId ->
                     navController.navigate(Screen.UserProfile.createRoute(userId))
+                },
+                onWriteReview = { articleId ->
+                    navController.navigate(
+                        Screen.ReviewForm.createRoute(articleId)
+                    )
+                },
+                onEditReview = { articleId, reviewId ->
+                    navController.navigate(
+                        Screen.ReviewForm.createRoute(articleId, reviewId)
+                    )
                 }
             )
         }
@@ -51,6 +62,11 @@ fun AppNavigation(
                 onBack = { navController.popBackStack() },
                 onArticleClick = { articleId ->
                     navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                },
+                onEditReview = { articleId, reviewId ->
+                    navController.navigate(
+                        Screen.ReviewForm.createRoute(articleId, reviewId)
+                    )
                 }
             )
         }
@@ -67,7 +83,30 @@ fun AppNavigation(
                 onBack = { navController.popBackStack() },
                 onArticleClick = { articleId ->
                     navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                },
+                onEditReview = { articleId, reviewId ->
+                    navController.navigate(
+                        Screen.ReviewForm.createRoute(articleId, reviewId)
+                    )
                 }
+            )
+        }
+
+        composable(
+            route = Screen.ReviewForm.route,
+            arguments = listOf(
+                navArgument(Screen.ReviewForm.ARG_ARTICLE_ID) {
+                    type = NavType.IntType
+                },
+                navArgument(Screen.ReviewForm.ARG_REVIEW_ID) {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) {
+            ReviewFormScreen(
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() }
             )
         }
     }

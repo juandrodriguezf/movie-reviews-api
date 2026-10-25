@@ -8,6 +8,8 @@ import javax.inject.Inject
 class RetrofitReviewDataSource @Inject constructor(
     private val service: MovieReviewsService
 ) : ReviewRemoteDataSource {
+    override suspend fun getReview(id: Int) = service.getReview(id)
+
     override suspend fun createReview(request: ReviewRequestDto) = service.createReview(request)
 
     override suspend fun updateReview(id: Int, request: ReviewRequestDto) =

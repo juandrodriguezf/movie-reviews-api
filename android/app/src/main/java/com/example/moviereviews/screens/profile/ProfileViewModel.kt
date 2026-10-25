@@ -3,6 +3,7 @@ package com.example.moviereviews.screens.profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.moviereviews.data.repository.ReviewRepository
 import com.example.moviereviews.data.repository.UserRepository
 import com.example.moviereviews.navigation.Screen
 import com.example.moviereviews.utils.Constants
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val reviewRepository: ReviewRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val userId: Int =
@@ -27,17 +29,24 @@ class ProfileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        loadProfile()
-    }
-
-    fun loadProfile() {
+    fun loadProfile(showLoading: Boolean = true) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null, reviewsError = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = showLoading && it.user == null,
+                    error = null,
+                    reviewsError = null,
+                    actionError = null
+                )
+            }
 
             when (val userResult = userRepository.getUser(userId)) {
                 is Result.Failure -> _uiState.update {
-                    it.copy(isLoading = false, error = userResult.message)
+                    if (it.user == null) {
+                        it.copy(isLoading = false, error = userResult.message)
+                    } else {
+                        it.copy(isLoading = false, actionError = userResult.message)
+                    }
                 }
 
                 is Result.Success -> {
@@ -62,6 +71,30 @@ class ProfileViewModel @Inject constructor(
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+
+    fun deleteReview(reviewId: Int) {
+        if (_uiState.value.isDeleting) {
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDeleting = true, actionError = null) }
+
+            when (val result = reviewRepository.deleteReview(reviewId)) {
+                is Result.Success -> _uiState.update {
+                    it.copy(
+                        isDeleting = false,
+                        reviews = it.reviews.filterNot { review -> review.id == reviewId },
+                        actionError = null
+                    )
+                }
+
+                is Result.Failure -> _uiState.update {
+                    it.copy(isDeleting = false, actionError = result.message)
                 }
             }
         }

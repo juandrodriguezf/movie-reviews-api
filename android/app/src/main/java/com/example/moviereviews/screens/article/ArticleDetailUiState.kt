@@ -8,5 +8,7 @@ data class ArticleDetailUiState(
     val article: ArticleInfo? = null,
     val reviews: List<ReviewInfo> = emptyList(),
     val error: String? = null,
-    val reviewsError: String? = null
+    val reviewsError: String? = null,
+    val isDeleting: Boolean = false,
+    val actionError: String? = null
 )

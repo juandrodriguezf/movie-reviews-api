@@ -16,4 +16,12 @@ sealed class Screen(val route: String) {
 
         fun createRoute(userId: Int) = "profile/$userId"
     }
+
+    data object ReviewForm : Screen("review/form?articleId={articleId}&reviewId={reviewId}") {
+        const val ARG_ARTICLE_ID = "articleId"
+        const val ARG_REVIEW_ID = "reviewId"
+
+        fun createRoute(articleId: Int, reviewId: Int = -1) =
+            "review/form?articleId=$articleId&reviewId=$reviewId"
+    }
 }

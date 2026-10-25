@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,9 +29,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.moviereviews.data.model.ArticleSummaryInfo
@@ -53,9 +60,49 @@ private val StarColor = Color(0xFFF5A623)
 fun ProfileScreen(
     onBack: () -> Unit,
     onArticleClick: (Int) -> Unit,
+    onEditReview: (Int, Int) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var reviewToDelete by remember { mutableStateOf<ReviewInfo?>(null) }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.loadProfile(
+            showLoading = viewModel.uiState.value.user == null
+        )
+    }
+
+    reviewToDelete?.let { review ->
+        AlertDialog(
+            onDismissRequest = {
+                if (!uiState.isDeleting) {
+                    reviewToDelete = null
+                }
+            },
+            title = { Text("Eliminar resena") },
+            text = { Text("Esta accion no se puede deshacer.") },
+            confirmButton = {
+                TextButton(
+                    enabled = !uiState.isDeleting,
+                    onClick = {
+                        reviewToDelete = null
+                        viewModel.deleteReview(review.id)
+                    }
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = !uiState.isDeleting,
+                    onClick = { reviewToDelete = null }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
     val title = if (viewModel.isOwnProfile) {
         "Mi perfil"
     } else {
@@ -92,8 +139,11 @@ fun ProfileScreen(
                 user = user,
                 reviews = uiState.reviews,
                 reviewsError = uiState.reviewsError,
+                actionError = uiState.actionError,
                 isOwnProfile = viewModel.isOwnProfile,
                 onArticleClick = onArticleClick,
+                onEditReview = onEditReview,
+                onDeleteReview = { reviewToDelete = it },
                 modifier = Modifier.padding(innerPadding)
             )
 
@@ -107,8 +157,11 @@ private fun ProfileContent(
     user: UserInfo,
     reviews: List<ReviewInfo>,
     reviewsError: String?,
+    actionError: String?,
     isOwnProfile: Boolean,
     onArticleClick: (Int) -> Unit,
+    onEditReview: (Int, Int) -> Unit,
+    onDeleteReview: (ReviewInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -129,6 +182,17 @@ private fun ProfileContent(
                     text = if (isOwnProfile) "Tus resenas" else "Sus resenas",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        if (actionError != null) {
+            item {
+                Text(
+                    text = actionError,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
         }
@@ -155,7 +219,14 @@ private fun ProfileContent(
             items(reviews, key = { it.id }) { review ->
                 ProfileReviewCard(
                     review = review,
+                    isOwn = isOwnProfile,
                     onArticleClick = onArticleClick,
+                    onEdit = {
+                        review.article?.id?.let { articleId ->
+                            onEditReview(articleId, review.id)
+                        }
+                    },
+                    onDelete = { onDeleteReview(review) },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                 )
             }
@@ -228,7 +299,10 @@ private fun ProfileHeader(
 @Composable
 private fun ProfileReviewCard(
     review: ReviewInfo,
+    isOwn: Boolean,
     onArticleClick: (Int) -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val article = review.article
@@ -275,6 +349,23 @@ private fun ProfileReviewCard(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                if (isOwn) {
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = onEdit) {
+                            Text("Editar")
+                        }
+
+                        TextButton(onClick = onDelete) {
+                            Text("Eliminar")
+                        }
+                    }
+                }
             }
         }
     }

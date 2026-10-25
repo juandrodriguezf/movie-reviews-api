@@ -28,6 +28,9 @@ interface MovieReviewsService {
     @GET("users/{id}/reviews")
     suspend fun getUserReviews(@Path("id") id: Int): List<ReviewDto>
 
+    @GET("reviews/{id}")
+    suspend fun getReview(@Path("id") id: Int): ReviewDto
+
     @POST("reviews")
     suspend fun createReview(@Body request: ReviewRequestDto): ReviewDto
 

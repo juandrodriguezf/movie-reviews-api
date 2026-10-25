@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviereviews.data.repository.ArticleRepository
+import com.example.moviereviews.data.repository.ReviewRepository
 import com.example.moviereviews.navigation.Screen
 import com.example.moviereviews.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class ArticleDetailViewModel @Inject constructor(
     private val articleRepository: ArticleRepository,
+    private val reviewRepository: ReviewRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val articleId: Int =
@@ -24,13 +26,40 @@ class ArticleDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ArticleDetailUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        loadArticle()
+    fun deleteReview(reviewId: Int) {
+        if (_uiState.value.isDeleting) {
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDeleting = true, actionError = null) }
+
+            when (val result = reviewRepository.deleteReview(reviewId)) {
+                is Result.Success -> _uiState.update {
+                    it.copy(
+                        isDeleting = false,
+                        reviews = it.reviews.filterNot { review -> review.id == reviewId },
+                        actionError = null
+                    )
+                }
+
+                is Result.Failure -> _uiState.update {
+                    it.copy(isDeleting = false, actionError = result.message)
+                }
+            }
+        }
     }
 
-    fun loadArticle() {
+    fun loadArticle(showLoading: Boolean = true) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null, reviewsError = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = showLoading && it.article == null,
+                    error = null,
+                    reviewsError = null,
+                    actionError = null
+                )
+            }
 
             if (articleId <= 0) {
                 _uiState.update {
@@ -41,7 +70,11 @@ class ArticleDetailViewModel @Inject constructor(
 
             when (val articleResult = articleRepository.getArticle(articleId)) {
                 is Result.Failure -> _uiState.update {
-                    it.copy(isLoading = false, error = articleResult.message)
+                    if (it.article == null) {
+                        it.copy(isLoading = false, error = articleResult.message)
+                    } else {
+                        it.copy(isLoading = false, actionError = articleResult.message)
+                    }
                 }
 
                 is Result.Success -> {
@@ -60,7 +93,11 @@ class ArticleDetailViewModel @Inject constructor(
                             it.copy(
                                 isLoading = false,
                                 article = articleResult.data,
-                                reviews = emptyList(),
+                                reviews = if (it.reviews.isEmpty()) {
+                                    emptyList()
+                                } else {
+                                    it.reviews
+                                },
                                 error = null,
                                 reviewsError = reviewsResult.message
                             )
