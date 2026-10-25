@@ -2,9 +2,12 @@ package com.example.moviereviews.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.moviereviews.screens.article.ArticleDetailScreen
 import com.example.moviereviews.screens.home.HomeScreen
 
 @Composable
@@ -16,7 +19,24 @@ fun AppNavigation(
         startDestination = Screen.Home.route
     ) {
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(
+                onArticleClick = { articleId ->
+                    navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ArticleDetail.route,
+            arguments = listOf(
+                navArgument(Screen.ArticleDetail.ARG_ARTICLE_ID) {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            ArticleDetailScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

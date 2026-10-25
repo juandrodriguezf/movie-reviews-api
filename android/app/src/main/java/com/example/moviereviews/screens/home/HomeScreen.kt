@@ -1,6 +1,7 @@
 package com.example.moviereviews.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    onArticleClick: (Int) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -73,7 +75,8 @@ fun HomeScreen(
 
             else -> ArticleGrid(
                 articles = uiState.articles,
-                innerPadding = innerPadding
+                innerPadding = innerPadding,
+                onArticleClick = onArticleClick
             )
         }
     }
@@ -82,7 +85,8 @@ fun HomeScreen(
 @Composable
 private fun ArticleGrid(
     articles: List<ArticleInfo>,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    onArticleClick: (Int) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -97,15 +101,23 @@ private fun ArticleGrid(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(articles, key = { it.id }) { article ->
-            ArticleCard(article)
+            ArticleCard(
+                article = article,
+                onClick = { onArticleClick(article.id) }
+            )
         }
     }
 }
 
 @Composable
-private fun ArticleCard(article: ArticleInfo) {
+private fun ArticleCard(
+    article: ArticleInfo,
+    onClick: () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
