@@ -1,6 +1,7 @@
 package com.example.moviereviews.screens.article
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ private val StarColor = Color(0xFFF5A623)
 @Composable
 fun ArticleDetailScreen(
     onBack: () -> Unit,
+    onUserClick: (Int) -> Unit,
     viewModel: ArticleDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -85,6 +87,7 @@ fun ArticleDetailScreen(
                 article = article,
                 reviews = uiState.reviews,
                 reviewsError = uiState.reviewsError,
+                onUserClick = onUserClick,
                 modifier = Modifier.padding(innerPadding)
             )
 
@@ -98,6 +101,7 @@ private fun ArticleContent(
     article: ArticleInfo,
     reviews: List<ReviewInfo>,
     reviewsError: String?,
+    onUserClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -189,6 +193,7 @@ private fun ArticleContent(
             items(reviews, key = { it.id }) { review ->
                 ReviewCard(
                     review = review,
+                    onUserClick = onUserClick,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                 )
             }
@@ -199,10 +204,15 @@ private fun ArticleContent(
 @Composable
 private fun ReviewCard(
     review: ReviewInfo,
+    onUserClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(enabled = review.user != null) {
+                review.user?.let { onUserClick(it.id) }
+            },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)

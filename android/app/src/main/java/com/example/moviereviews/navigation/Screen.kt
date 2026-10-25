@@ -8,4 +8,12 @@ sealed class Screen(val route: String) {
 
         fun createRoute(articleId: Int) = "article/$articleId"
     }
+
+    data object MyProfile : Screen("profile/me")
+
+    data object UserProfile : Screen("profile/{userId}") {
+        const val ARG_USER_ID = "userId"
+
+        fun createRoute(userId: Int) = "profile/$userId"
+    }
 }
