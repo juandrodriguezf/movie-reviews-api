@@ -29,8 +29,15 @@ La guía completa del backend está en [`../backend/README.md`](../backend/READM
 
 ## Conexión con el backend
 
-- URL base: `http://10.0.2.2:3000/` (desde el emulador, `10.0.2.2` es el equipo anfitrión).
-- El tráfico HTTP sin cifrar está permitido únicamente hacia `10.0.2.2` mediante `res/xml/network_security_config.xml`.
+Antes de abrir la app, crear el puente entre el equipo y el emulador:
+
+```bash
+adb reverse tcp:3000 tcp:3000
+```
+
+- URL base: `http://127.0.0.1:3000/`.
+- El tráfico HTTP sin cifrar está permitido únicamente hacia `127.0.0.1` y `10.0.2.2` mediante `res/xml/network_security_config.xml`.
+- `adb reverse` permite usar la misma URL en emulador y dispositivo físico, sin depender de la IP del equipo anfitrión.
 - El usuario autenticado se fija en `id = 1`; no se usa Firebase ni se requiere `google-services.json`.
 
 ## Compilar por consola

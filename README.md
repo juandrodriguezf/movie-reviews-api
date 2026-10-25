@@ -32,7 +32,8 @@ Guía completa: [backend/README.md](backend/README.md).
 
 1. Abrir la carpeta `android/` en Android Studio.
 2. Usar un Gradle JDK 17 o 21 y ejecutar el sync.
-3. Ejecutar la app en un emulador con el backend activo.
+3. Crear el puente al backend: `adb reverse tcp:3000 tcp:3000`.
+4. Ejecutar la app en un emulador con el backend activo.
 
 Guía completa: [android/README.md](android/README.md).
 
