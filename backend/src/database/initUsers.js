@@ -2,10 +2,10 @@ import { User } from '../models/user.js';
 
 const users = [
   {
-    username: 'laura_dev',
-    email: 'laura.gomez@javeriana.edu.co',
-    name: 'Laura Gomez',
-    avatarUrl: 'https://i.pravatar.cc/150?img=1'
+    username: 'juan.rodriguez',
+    email: 'juan.rodriguez@javeriana.edu.co',
+    name: 'Juan Rodriguez',
+    avatarUrl: 'https://i.pravatar.cc/150?img=11'
   },
   {
     username: 'camilo.cine',
