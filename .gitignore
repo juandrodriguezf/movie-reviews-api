@@ -12,3 +12,4 @@ coverage/
 postman/collections/
 postman/environments/
 postman/globals/
+**/google-services.json
