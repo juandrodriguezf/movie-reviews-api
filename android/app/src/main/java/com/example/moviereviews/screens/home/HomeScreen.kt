@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -41,9 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.moviereviews.BuildConfig
 import com.example.moviereviews.data.model.ArticleInfo
-import com.example.moviereviews.utils.BackendConfig
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,8 +79,6 @@ fun HomeScreen(
             )
 
             uiState.articles.isEmpty() -> EmptyState(
-                isSeeding = uiState.isSeeding,
-                onSeed = viewModel::seedDemoData,
                 modifier = Modifier.padding(innerPadding)
             )
 
@@ -236,11 +231,7 @@ private fun ErrorState(
 }
 
 @Composable
-private fun EmptyState(
-    isSeeding: Boolean,
-    onSeed: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun EmptyState(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -252,24 +243,5 @@ private fun EmptyState(
             text = "No hay peliculas disponibles",
             style = MaterialTheme.typography.bodyLarge
         )
-
-        if (BuildConfig.DEBUG && BackendConfig.isFirestore) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = onSeed,
-                enabled = !isSeeding
-            ) {
-                if (isSeeding) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Text("Cargar datos de ejemplo")
-                }
-            }
-        }
     }
 }

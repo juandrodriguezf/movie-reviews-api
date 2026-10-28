@@ -32,11 +32,17 @@ defecto es `firestore`.
    ```
 
 4. Instalar y abrir. La app arranca en Login.
-5. Si las colecciones estan vacias, el boton **Cargar datos de ejemplo** de Home
-   crea 8 articulos, 4 usuarios demo y 8 resenas. Solo aparece en builds debug.
+5. Si la base esta vacia, crea los datos iniciales manualmente:
+   - Registra una cuenta desde la app para crear `users/{uid}`.
+   - Agrega articulos en la coleccion `articles` desde Firebase Console.
+   - Publica resenas desde la app.
+   - Para ver el perfil de otro usuario, crea documentos adicionales en `users`
+     y resenas que los referencien.
 
 En este modo el usuario actual es el UID de Firebase Auth y su perfil se crea
-en `users/{uid}` durante el registro.
+en `users/{uid}` durante el registro. La base de ejemplo de esta entrega ya
+incluye 8 articulos, 4 usuarios demo y 8 resenas de ejemplo, ademas de las que
+se creen desde la app.
 
 ### Express
 
@@ -76,7 +82,7 @@ Si se reinicia `adb`, hay que repetir `adb reverse`.
   - `"1"` en Express.
   - El UID de Firebase Auth en Firestore.
 - `SessionGate` solo muestra Login/Register en Firestore.
-- El cierre de sesion y el seed de datos solo estan disponibles en Firestore.
+- El cierre de sesion solo esta disponible en Firestore.
 
 ## Arquitectura
 
@@ -101,7 +107,7 @@ navigation/
 utils/
   BackendConfig.kt
   CurrentUserProvider.kt
-  FirestoreSeeder.kt
+  NumericStringTypeAdapter.kt
   Result.kt
 ```
 
@@ -138,12 +144,20 @@ Reglas recomendadas para desarrollo:
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     match /{document=**} {
       allow read, write: if request.auth != null;
     }
   }
 }
 ```
+
+La lectura publica de `users` permite validar el `username` antes de crear la
+cuenta en Firebase Auth. Las escrituras siguen requiriendo sesion.
 
 ## Comandos utiles
 
@@ -168,8 +182,8 @@ adb logcat -s AndroidRuntime:E
   instaladas al mismo tiempo.
 - `google-services.json` esta ignorado por Git. Solo es obligatorio en el modo
   Firestore.
-- Los usuarios creados con Firebase Auth empiezan sin resenas. Las resenas del
-  seed pertenecen a los usuarios `seed-*`.
+- Los usuarios nuevos de Firebase Auth empiezan sin resenas. La base de ejemplo
+  ya contiene articulos, usuarios demo y resenas cargadas previamente.
 - La edicion de perfil esta en `profile/edit`: nombre, username, bio, avatar y
   articulo principal. Solo aparece en modo Firestore.
 - El articulo principal (`mainArticleId`) se muestra como tarjeta en el perfil

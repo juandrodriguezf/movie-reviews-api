@@ -18,7 +18,17 @@ backend se elige al compilar: `-Pbackend=firestore` o `-Pbackend=express`.
    ```
 
 4. Instalar y abrir. La app arranca en Login.
-5. Si Firestore está vacío, usar **Cargar datos de ejemplo** en Home (solo debug).
+5. Si Firestore está vacío, crear los datos iniciales manualmente:
+   - Registrar una cuenta desde la app; se crea `users/{uid}`.
+   - Agregar los artículos en la colección `articles` desde Firebase Console.
+   - Publicar reseñas desde la app.
+   - Para probar perfiles de otros usuarios, crear documentos `users/{id}` y
+     reseñas que los referencien, o registrar otra cuenta y publicar desde ella.
+   - Para el artículo principal, abrir **Editar perfil** y seleccionar un artículo.
+
+La base de ejemplo de esta entrega ya contiene 8 artículos, 4 usuarios demo y
+8 reseñas de ejemplo, además de las que se creen desde la app, por lo que se
+puede usar directamente para la demostración.
 
 ### Modo Express
 
@@ -94,12 +104,20 @@ Reglas recomendadas para desarrollo:
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     match /{document=**} {
       allow read, write: if request.auth != null;
     }
   }
 }
 ```
+
+La lectura pública de `users` permite validar el `username` antes de crear la
+cuenta en Firebase Auth. Las escrituras siguen requiriendo sesión.
 
 ## Doble backend
 
@@ -182,8 +200,8 @@ que se está editando.
 ## Evidencias
 
 - Semana 10: capturas en `docs/img/` para Home, detalle, perfiles y CRUD.
-- Semana 11: pendiente agregar capturas de Login, registro, seed y perfil
-  cargado desde Firestore.
+- Semana 11: pendiente agregar capturas de Login, registro, perfil, edición y
+  artículo principal cargados desde Firestore.
 
 ## Notas
 
@@ -191,7 +209,10 @@ que se está editando.
   que recompilar e instalar. No se pueden tener las dos variantes instaladas a
   la vez.
 - `google-services.json` está ignorado por Git. Solo es necesario en Firestore.
-- Los usuarios de Firebase Auth empiezan sin reseñas; las reseñas del seed
-  pertenecen a los usuarios `seed-*`.
+- La app no incluye un seeder; los datos iniciales se cargan manualmente o ya
+  están en la base de ejemplo.
+- Los usuarios nuevos de Firebase Auth empiezan sin reseñas. La base de ejemplo
+  ya contiene 8 artículos, 4 usuarios demo y 8 reseñas de ejemplo, además de
+  las que se creen desde la app.
 - La edición de perfil solo está disponible en modo Firestore; en Express el
   usuario actual es fijo (`id = 1`).
