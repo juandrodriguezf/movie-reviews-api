@@ -58,17 +58,20 @@ puede usar directamente para la demostración.
 
 ## Funcionalidades Semana 11
 
-| Funcionalidad | Estado | Implementación |
-|---|---|---|
-| Registrar usuario guardando su información en Firestore | OK | `RegisterViewModel`, `AuthRepository` y `FirestoreUserDataSource.createUserProfile`. Crea `users/{uid}`. |
-| Ver mi perfil | OK | `profile/me`; `ProfileViewModel` usa el UID de Auth o `id = 1` en Express. |
-| Modificar mi perfil | OK | `EditProfileScreen` en `profile/edit`: nombre, username, bio, avatar y artículo principal. Actualiza `users/{uid}` y las copias de `user` en `reviews`. |
-| Ver el perfil de cualquier otro usuario | OK | Ruta `profile/{userId}`, abierta desde el autor de una reseña. |
-| Leer su artículo principal | OK | `ProfileViewModel` carga `mainArticleId` y `ProfileScreen` muestra la tarjeta “Artículo principal” en el perfil propio y ajeno. |
-| Ver todos los artículos | OK | `HomeScreen` y `GET /articles` o colección `articles`. |
-| Ver las reseñas de un artículo | OK | `ArticleDetailScreen` y `GET /articles/:id/reviews` o `whereEqualTo("articleId", id)`. |
-| Ver el detalle de un artículo | OK | `ArticleDetailScreen` con imagen, ficha y puntaje. |
-| Escribir una reseña | OK | `ReviewFormScreen`; crea en Firestore o con `POST /reviews`. |
+| Funcionalidad | Estado | Implementación | Evidencia |
+|---|---|---|---|
+| Registrar usuario guardando su información en Firestore | OK | `RegisterViewModel`, `AuthRepository` y `FirestoreUserDataSource.createUserProfile`. Crea `users/{uid}`. | [10-registro](../img/10-registro.png) |
+| Ver mi perfil | OK | `profile/me`; `ProfileViewModel` usa el UID de Auth o `id = 1` en Express. | [12-mi-perfil](../img/12-mi-perfil.png) |
+| Modificar mi perfil | OK | `EditProfileScreen` en `profile/edit`: nombre, username, bio, avatar y artículo principal. Actualiza `users/{uid}` y las copias de `user` en `reviews`. | [13-editar-perfil](../img/13-editar-perfil.png), [14-articulo-principal](../img/14-articulo-principal.png) |
+| Ver el perfil de cualquier otro usuario | OK | Ruta `profile/{userId}`, abierta desde el autor de una reseña. | [15-perfil-otro](../img/15-perfil-otro.png) |
+| Leer su artículo principal | OK | `ProfileViewModel` carga `mainArticleId` y `ProfileScreen` muestra la tarjeta “Artículo principal” en el perfil propio y ajeno. | [12-mi-perfil](../img/12-mi-perfil.png), [15-perfil-otro](../img/15-perfil-otro.png) |
+| Ver todos los artículos | OK | `HomeScreen` y `GET /articles` o colección `articles`. | [11-home-firestore](../img/11-home-firestore.png), [18-home-firestore-scroll](../img/18-home-firestore-scroll.png) |
+| Ver las reseñas de un artículo | OK | `ArticleDetailScreen` y `GET /articles/:id/reviews` o `whereEqualTo("articleId", id)`. | [16-detalle](../img/16-detalle.png) |
+| Ver el detalle de un artículo | OK | `ArticleDetailScreen` con imagen, ficha y puntaje. | [16-detalle](../img/16-detalle.png) |
+| Escribir una reseña | OK | `ReviewFormScreen`; crea en Firestore o con `POST /reviews`. | [17-escribir-resena](../img/17-escribir-resena.png) |
+
+Evidencias de autenticación: [09-login](../img/09-login.png) y
+[10-registro](../img/10-registro.png).
 
 ## Autenticación con Firebase
 
@@ -200,8 +203,14 @@ que se está editando.
 ## Evidencias
 
 - Semana 10: capturas en `docs/img/` para Home, detalle, perfiles y CRUD.
-- Semana 11: pendiente agregar capturas de Login, registro, perfil, edición y
-  artículo principal cargados desde Firestore.
+- Semana 11: [Login](../img/09-login.png), [registro](../img/10-registro.png),
+  [Home Firestore](../img/11-home-firestore.png),
+  [Home Firestore (scroll)](../img/18-home-firestore-scroll.png),
+  [mi perfil](../img/12-mi-perfil.png), [editar perfil](../img/13-editar-perfil.png),
+  [artículo principal](../img/14-articulo-principal.png),
+  [perfil de otro usuario](../img/15-perfil-otro.png),
+  [detalle](../img/16-detalle.png) y
+  [escribir reseña](../img/17-escribir-resena.png).
 
 ## Notas
 
