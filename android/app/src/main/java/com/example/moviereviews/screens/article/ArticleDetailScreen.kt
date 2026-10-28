@@ -60,9 +60,9 @@ private val StarColor = Color(0xFFF5A623)
 @Composable
 fun ArticleDetailScreen(
     onBack: () -> Unit,
-    onUserClick: (Int) -> Unit,
-    onWriteReview: (Int) -> Unit,
-    onEditReview: (Int, Int) -> Unit,
+    onUserClick: (String) -> Unit,
+    onWriteReview: (String) -> Unit,
+    onEditReview: (String, String) -> Unit,
     viewModel: ArticleDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -154,14 +154,14 @@ private fun ArticleContent(
     reviews: List<ReviewInfo>,
     reviewsError: String?,
     actionError: String?,
-    onUserClick: (Int) -> Unit,
+    onUserClick: (String) -> Unit,
     onWriteReview: () -> Unit,
     onEditReview: (ReviewInfo) -> Unit,
     onDeleteReview: (ReviewInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val ownReview = reviews.firstOrNull {
-        it.user?.id == Constants.CURRENT_USER_ID
+        it.userId == Constants.CURRENT_USER_ID
     }
 
     LazyColumn(
@@ -289,7 +289,7 @@ private fun ArticleContent(
 private fun ReviewCard(
     review: ReviewInfo,
     isOwn: Boolean,
-    onUserClick: (Int) -> Unit,
+    onUserClick: (String) -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier

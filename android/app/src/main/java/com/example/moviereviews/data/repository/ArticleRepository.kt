@@ -16,11 +16,11 @@ class ArticleRepository @Inject constructor(
         remoteDataSource.getArticles().map { it.toArticleInfo() }
     }
 
-    suspend fun getArticle(id: Int): Result<ArticleInfo> = apiCall {
+    suspend fun getArticle(id: String): Result<ArticleInfo> = apiCall {
         remoteDataSource.getArticle(id).toArticleInfo()
     }
 
-    suspend fun getArticleReviews(id: Int): Result<List<ReviewInfo>> = apiCall {
+    suspend fun getArticleReviews(id: String): Result<List<ReviewInfo>> = apiCall {
         remoteDataSource.getArticleReviews(id).map { it.toReviewInfo() }
     }
 }

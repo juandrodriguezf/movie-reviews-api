@@ -1,7 +1,7 @@
 package com.example.moviereviews.data.model
 
 data class ArticleInfo(
-    val id: Int,
+    val id: String,
     val title: String,
     val director: String,
     val genre: String,

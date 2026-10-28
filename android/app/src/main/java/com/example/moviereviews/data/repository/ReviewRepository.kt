@@ -11,13 +11,13 @@ import javax.inject.Inject
 class ReviewRepository @Inject constructor(
     private val remoteDataSource: ReviewRemoteDataSource
 ) {
-    suspend fun getReview(id: Int): Result<ReviewInfo> = apiCall {
+    suspend fun getReview(id: String): Result<ReviewInfo> = apiCall {
         remoteDataSource.getReview(id).toReviewInfo()
     }
 
     suspend fun createReview(
-        userId: Int,
-        articleId: Int,
+        userId: String,
+        articleId: String,
         rating: Int,
         comment: String
     ): Result<ReviewInfo> = apiCall {
@@ -32,9 +32,9 @@ class ReviewRepository @Inject constructor(
     }
 
     suspend fun updateReview(
-        id: Int,
-        userId: Int,
-        articleId: Int,
+        id: String,
+        userId: String,
+        articleId: String,
         rating: Int,
         comment: String
     ): Result<ReviewInfo> = apiCall {
@@ -49,7 +49,7 @@ class ReviewRepository @Inject constructor(
         ).toReviewInfo()
     }
 
-    suspend fun deleteReview(id: Int): Result<Unit> = apiCall {
+    suspend fun deleteReview(id: String): Result<Unit> = apiCall {
         remoteDataSource.deleteReview(id)
     }
 }

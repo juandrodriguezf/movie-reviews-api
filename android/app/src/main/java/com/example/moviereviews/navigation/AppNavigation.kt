@@ -11,6 +11,7 @@ import com.example.moviereviews.screens.article.ArticleDetailScreen
 import com.example.moviereviews.screens.home.HomeScreen
 import com.example.moviereviews.screens.profile.ProfileScreen
 import com.example.moviereviews.screens.review.ReviewFormScreen
+import com.example.moviereviews.utils.Constants
 
 @Composable
 fun AppNavigation(
@@ -35,7 +36,7 @@ fun AppNavigation(
             route = Screen.ArticleDetail.route,
             arguments = listOf(
                 navArgument(Screen.ArticleDetail.ARG_ARTICLE_ID) {
-                    type = NavType.IntType
+                    type = NavType.StringType
                 }
             )
         ) {
@@ -75,7 +76,7 @@ fun AppNavigation(
             route = Screen.UserProfile.route,
             arguments = listOf(
                 navArgument(Screen.UserProfile.ARG_USER_ID) {
-                    type = NavType.IntType
+                    type = NavType.StringType
                 }
             )
         ) {
@@ -96,11 +97,11 @@ fun AppNavigation(
             route = Screen.ReviewForm.route,
             arguments = listOf(
                 navArgument(Screen.ReviewForm.ARG_ARTICLE_ID) {
-                    type = NavType.IntType
+                    type = NavType.StringType
                 },
                 navArgument(Screen.ReviewForm.ARG_REVIEW_ID) {
-                    type = NavType.IntType
-                    defaultValue = -1
+                    type = NavType.StringType
+                    defaultValue = Constants.NO_REVIEW_ID
                 }
             )
         ) {

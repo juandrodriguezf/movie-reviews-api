@@ -12,11 +12,11 @@ import javax.inject.Inject
 class UserRepository @Inject constructor(
     private val remoteDataSource: UserRemoteDataSource
 ) {
-    suspend fun getUser(id: Int): Result<UserInfo> = apiCall {
+    suspend fun getUser(id: String): Result<UserInfo> = apiCall {
         remoteDataSource.getUser(id).toUserInfo()
     }
 
-    suspend fun getUserReviews(id: Int): Result<List<ReviewInfo>> = apiCall {
+    suspend fun getUserReviews(id: String): Result<List<ReviewInfo>> = apiCall {
         remoteDataSource.getUserReviews(id).map { it.toReviewInfo() }
     }
 }

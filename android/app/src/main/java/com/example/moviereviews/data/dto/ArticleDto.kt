@@ -3,7 +3,7 @@ package com.example.moviereviews.data.dto
 import com.example.moviereviews.data.model.ArticleInfo
 
 data class ArticleDto(
-    val id: Int,
+    val id: String,
     val title: String,
     val director: String,
     val genre: String,

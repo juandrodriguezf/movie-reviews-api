@@ -59,8 +59,8 @@ private val StarColor = Color(0xFFF5A623)
 @Composable
 fun ProfileScreen(
     onBack: () -> Unit,
-    onArticleClick: (Int) -> Unit,
-    onEditReview: (Int, Int) -> Unit,
+    onArticleClick: (String) -> Unit,
+    onEditReview: (String, String) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -159,8 +159,8 @@ private fun ProfileContent(
     reviewsError: String?,
     actionError: String?,
     isOwnProfile: Boolean,
-    onArticleClick: (Int) -> Unit,
-    onEditReview: (Int, Int) -> Unit,
+    onArticleClick: (String) -> Unit,
+    onEditReview: (String, String) -> Unit,
     onDeleteReview: (ReviewInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -300,7 +300,7 @@ private fun ProfileHeader(
 private fun ProfileReviewCard(
     review: ReviewInfo,
     isOwn: Boolean,
-    onArticleClick: (Int) -> Unit,
+    onArticleClick: (String) -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier

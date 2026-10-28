@@ -21,7 +21,7 @@ class ProfileViewModel @Inject constructor(
     private val reviewRepository: ReviewRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val userId: Int =
+    private val userId: String =
         savedStateHandle[Screen.UserProfile.ARG_USER_ID] ?: Constants.CURRENT_USER_ID
 
     val isOwnProfile: Boolean = userId == Constants.CURRENT_USER_ID
@@ -76,7 +76,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun deleteReview(reviewId: Int) {
+    fun deleteReview(reviewId: String) {
         if (_uiState.value.isDeleting) {
             return
         }

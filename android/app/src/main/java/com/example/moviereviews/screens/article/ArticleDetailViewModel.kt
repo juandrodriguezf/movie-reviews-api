@@ -20,13 +20,13 @@ class ArticleDetailViewModel @Inject constructor(
     private val reviewRepository: ReviewRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val articleId: Int =
-        savedStateHandle[Screen.ArticleDetail.ARG_ARTICLE_ID] ?: -1
+    private val articleId: String =
+        savedStateHandle[Screen.ArticleDetail.ARG_ARTICLE_ID] ?: ""
 
     private val _uiState = MutableStateFlow(ArticleDetailUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun deleteReview(reviewId: Int) {
+    fun deleteReview(reviewId: String) {
         if (_uiState.value.isDeleting) {
             return
         }
@@ -61,7 +61,7 @@ class ArticleDetailViewModel @Inject constructor(
                 )
             }
 
-            if (articleId <= 0) {
+            if (articleId.isBlank()) {
                 _uiState.update {
                     it.copy(isLoading = false, error = "Articulo no encontrado")
                 }

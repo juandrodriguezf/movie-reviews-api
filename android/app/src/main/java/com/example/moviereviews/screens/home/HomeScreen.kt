@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -40,13 +41,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.moviereviews.BuildConfig
 import com.example.moviereviews.data.model.ArticleInfo
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onArticleClick: (Int) -> Unit,
+    onArticleClick: (String) -> Unit,
     onProfileClick: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -78,7 +80,11 @@ fun HomeScreen(
                 modifier = Modifier.padding(innerPadding)
             )
 
-            uiState.articles.isEmpty() -> EmptyState(Modifier.padding(innerPadding))
+            uiState.articles.isEmpty() -> EmptyState(
+                isSeeding = uiState.isSeeding,
+                onSeed = viewModel::seedDemoData,
+                modifier = Modifier.padding(innerPadding)
+            )
 
             else -> ArticleGrid(
                 articles = uiState.articles,
@@ -93,7 +99,7 @@ fun HomeScreen(
 private fun ArticleGrid(
     articles: List<ArticleInfo>,
     innerPadding: PaddingValues,
-    onArticleClick: (Int) -> Unit
+    onArticleClick: (String) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -229,14 +235,40 @@ private fun ErrorState(
 }
 
 @Composable
-private fun EmptyState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+private fun EmptyState(
+    isSeeding: Boolean,
+    onSeed: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "No hay peliculas disponibles",
             style = MaterialTheme.typography.bodyLarge
         )
+
+        if (BuildConfig.DEBUG) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onSeed,
+                enabled = !isSeeding
+            ) {
+                if (isSeeding) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Cargar datos de ejemplo")
+                }
+            }
+        }
     }
 }

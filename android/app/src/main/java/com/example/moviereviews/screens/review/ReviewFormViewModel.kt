@@ -22,13 +22,13 @@ class ReviewFormViewModel @Inject constructor(
     private val reviewRepository: ReviewRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val articleId: Int =
-        savedStateHandle[Screen.ReviewForm.ARG_ARTICLE_ID] ?: -1
+    private val articleId: String =
+        savedStateHandle[Screen.ReviewForm.ARG_ARTICLE_ID] ?: ""
 
-    private val reviewId: Int =
+    private val reviewId: String =
         savedStateHandle[Screen.ReviewForm.ARG_REVIEW_ID] ?: Constants.NO_REVIEW_ID
 
-    private val isEditing: Boolean = reviewId > 0
+    private val isEditing: Boolean = reviewId.isNotBlank()
 
     private val _uiState = MutableStateFlow(
         ReviewFormUiState(isEditing = isEditing)
@@ -45,7 +45,7 @@ class ReviewFormViewModel @Inject constructor(
                 it.copy(isLoading = true, isReady = false, error = null)
             }
 
-            if (articleId <= 0) {
+            if (articleId.isBlank()) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -96,7 +96,7 @@ class ReviewFormViewModel @Inject constructor(
             is Result.Success -> {
                 val review = reviewResult.data
 
-                if (review.user?.id != Constants.CURRENT_USER_ID) {
+                if (review.userId != Constants.CURRENT_USER_ID) {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
