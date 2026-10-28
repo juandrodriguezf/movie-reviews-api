@@ -1,6 +1,7 @@
 package com.example.moviereviews.data.repository
 
 import com.example.moviereviews.data.datasource.UserRemoteDataSource
+import com.example.moviereviews.data.dto.UserDto
 import com.example.moviereviews.data.dto.toReviewInfo
 import com.example.moviereviews.data.dto.toUserInfo
 import com.example.moviereviews.data.model.ReviewInfo
@@ -18,5 +19,31 @@ class UserRepository @Inject constructor(
 
     suspend fun getUserReviews(id: String): Result<List<ReviewInfo>> = apiCall {
         remoteDataSource.getUserReviews(id).map { it.toReviewInfo() }
+    }
+
+    suspend fun usernameExists(username: String): Result<Boolean> = apiCall {
+        remoteDataSource.usernameExists(username)
+    }
+
+    suspend fun createUserProfile(
+        uid: String,
+        name: String,
+        username: String,
+        email: String,
+        avatarUrl: String = "",
+        bio: String = "",
+        mainArticleId: String? = "1"
+    ): Result<UserInfo> = apiCall {
+        remoteDataSource.createUserProfile(
+            UserDto(
+                id = uid,
+                username = username,
+                email = email,
+                name = name,
+                avatarUrl = avatarUrl,
+                bio = bio,
+                mainArticleId = mainArticleId
+            )
+        ).toUserInfo()
     }
 }

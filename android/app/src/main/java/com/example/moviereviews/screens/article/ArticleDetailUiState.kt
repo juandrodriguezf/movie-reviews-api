@@ -5,6 +5,7 @@ import com.example.moviereviews.data.model.ReviewInfo
 
 data class ArticleDetailUiState(
     val isLoading: Boolean = true,
+    val currentUserId: String = "",
     val article: ArticleInfo? = null,
     val reviews: List<ReviewInfo> = emptyList(),
     val error: String? = null,

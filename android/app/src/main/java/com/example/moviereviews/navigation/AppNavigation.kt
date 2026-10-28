@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.moviereviews.screens.article.ArticleDetailScreen
+import com.example.moviereviews.screens.auth.SessionGate
 import com.example.moviereviews.screens.home.HomeScreen
 import com.example.moviereviews.screens.profile.ProfileScreen
 import com.example.moviereviews.screens.review.ReviewFormScreen
@@ -17,6 +18,13 @@ import com.example.moviereviews.utils.Constants
 fun AppNavigation(
     navController: NavHostController = rememberNavController()
 ) {
+    SessionGate {
+        AppNavHost(navController)
+    }
+}
+
+@Composable
+private fun AppNavHost(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route

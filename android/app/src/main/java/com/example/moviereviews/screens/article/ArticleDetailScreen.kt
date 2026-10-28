@@ -51,7 +51,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.moviereviews.data.model.ArticleInfo
 import com.example.moviereviews.data.model.ReviewInfo
-import com.example.moviereviews.utils.Constants
 import java.util.Locale
 
 private val StarColor = Color(0xFFF5A623)
@@ -133,6 +132,7 @@ fun ArticleDetailScreen(
 
             article != null -> ArticleContent(
                 article = article,
+                currentUserId = uiState.currentUserId,
                 reviews = uiState.reviews,
                 reviewsError = uiState.reviewsError,
                 actionError = uiState.actionError,
@@ -151,6 +151,7 @@ fun ArticleDetailScreen(
 @Composable
 private fun ArticleContent(
     article: ArticleInfo,
+    currentUserId: String,
     reviews: List<ReviewInfo>,
     reviewsError: String?,
     actionError: String?,
@@ -161,7 +162,7 @@ private fun ArticleContent(
     modifier: Modifier = Modifier
 ) {
     val ownReview = reviews.firstOrNull {
-        it.userId == Constants.CURRENT_USER_ID
+        it.userId == currentUserId
     }
 
     LazyColumn(

@@ -120,6 +120,13 @@ fun ProfileScreen(
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
+                },
+                actions = {
+                    if (viewModel.isOwnProfile) {
+                        TextButton(onClick = viewModel::logout) {
+                            Text("Salir")
+                        }
+                    }
                 }
             )
         }

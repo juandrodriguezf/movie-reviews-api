@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.moviereviews.data.repository.ArticleRepository
 import com.example.moviereviews.data.repository.ReviewRepository
 import com.example.moviereviews.navigation.Screen
+import com.example.moviereviews.utils.CurrentUserProvider
 import com.example.moviereviews.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -18,12 +19,17 @@ import kotlinx.coroutines.launch
 class ArticleDetailViewModel @Inject constructor(
     private val articleRepository: ArticleRepository,
     private val reviewRepository: ReviewRepository,
+    currentUserProvider: CurrentUserProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val articleId: String =
         savedStateHandle[Screen.ArticleDetail.ARG_ARTICLE_ID] ?: ""
 
-    private val _uiState = MutableStateFlow(ArticleDetailUiState())
+    private val _uiState = MutableStateFlow(
+        ArticleDetailUiState(
+            currentUserId = currentUserProvider.currentUserId().orEmpty()
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     fun deleteReview(reviewId: String) {

@@ -8,6 +8,7 @@ import com.example.moviereviews.data.repository.ArticleRepository
 import com.example.moviereviews.data.repository.ReviewRepository
 import com.example.moviereviews.navigation.Screen
 import com.example.moviereviews.utils.Constants
+import com.example.moviereviews.utils.CurrentUserProvider
 import com.example.moviereviews.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -20,8 +21,11 @@ import kotlinx.coroutines.launch
 class ReviewFormViewModel @Inject constructor(
     private val articleRepository: ArticleRepository,
     private val reviewRepository: ReviewRepository,
+    currentUserProvider: CurrentUserProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    private val currentUserId: String = currentUserProvider.currentUserId().orEmpty()
+
     private val articleId: String =
         savedStateHandle[Screen.ReviewForm.ARG_ARTICLE_ID] ?: ""
 
@@ -96,7 +100,7 @@ class ReviewFormViewModel @Inject constructor(
             is Result.Success -> {
                 val review = reviewResult.data
 
-                if (review.userId != Constants.CURRENT_USER_ID) {
+                if (review.userId != currentUserId) {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -163,14 +167,14 @@ class ReviewFormViewModel @Inject constructor(
             val result = if (isEditing) {
                 reviewRepository.updateReview(
                     id = reviewId,
-                    userId = Constants.CURRENT_USER_ID,
+                    userId = currentUserId,
                     articleId = article.id,
                     rating = current.rating,
                     comment = comment
                 )
             } else {
                 reviewRepository.createReview(
-                    userId = Constants.CURRENT_USER_ID,
+                    userId = currentUserId,
                     articleId = article.id,
                     rating = current.rating,
                     comment = comment

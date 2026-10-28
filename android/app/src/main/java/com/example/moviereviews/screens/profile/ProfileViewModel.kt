@@ -3,10 +3,11 @@ package com.example.moviereviews.screens.profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.moviereviews.data.repository.AuthRepository
 import com.example.moviereviews.data.repository.ReviewRepository
 import com.example.moviereviews.data.repository.UserRepository
 import com.example.moviereviews.navigation.Screen
-import com.example.moviereviews.utils.Constants
+import com.example.moviereviews.utils.CurrentUserProvider
 import com.example.moviereviews.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -19,12 +20,16 @@ import kotlinx.coroutines.launch
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
+    private val authRepository: AuthRepository,
+    currentUserProvider: CurrentUserProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val userId: String =
-        savedStateHandle[Screen.UserProfile.ARG_USER_ID] ?: Constants.CURRENT_USER_ID
+    private val currentUserId: String = currentUserProvider.currentUserId().orEmpty()
 
-    val isOwnProfile: Boolean = userId == Constants.CURRENT_USER_ID
+    private val userId: String =
+        savedStateHandle[Screen.UserProfile.ARG_USER_ID] ?: currentUserId
+
+    val isOwnProfile: Boolean = userId == currentUserId
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
@@ -74,6 +79,10 @@ class ProfileViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun logout() {
+        authRepository.signOut()
     }
 
     fun deleteReview(reviewId: String) {
