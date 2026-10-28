@@ -12,9 +12,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.moviereviews.utils.BackendConfig
 
 @Composable
 fun SessionGate(content: @Composable () -> Unit) {
+    if (BackendConfig.isExpress) {
+        content()
+        return
+    }
+
     val sessionViewModel: SessionViewModel = hiltViewModel()
     val isLoggedIn by sessionViewModel.isLoggedIn.collectAsStateWithLifecycle()
     var showRegister by rememberSaveable { mutableStateOf(false) }

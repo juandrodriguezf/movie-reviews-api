@@ -7,10 +7,12 @@ import com.example.moviereviews.data.repository.AuthRepository
 import com.example.moviereviews.data.repository.ReviewRepository
 import com.example.moviereviews.data.repository.UserRepository
 import com.example.moviereviews.navigation.Screen
+import com.example.moviereviews.utils.BackendConfig
 import com.example.moviereviews.utils.CurrentUserProvider
 import com.example.moviereviews.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,7 +22,7 @@ import kotlinx.coroutines.launch
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
-    private val authRepository: AuthRepository,
+    private val authRepositoryProvider: Provider<AuthRepository>,
     currentUserProvider: CurrentUserProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -82,7 +84,9 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun logout() {
-        authRepository.signOut()
+        if (BackendConfig.isFirestore) {
+            authRepositoryProvider.get().signOut()
+        }
     }
 
     fun deleteReview(reviewId: String) {

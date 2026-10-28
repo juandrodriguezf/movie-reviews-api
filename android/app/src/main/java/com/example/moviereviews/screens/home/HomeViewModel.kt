@@ -3,10 +3,12 @@ package com.example.moviereviews.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviereviews.data.repository.ArticleRepository
+import com.example.moviereviews.utils.BackendConfig
 import com.example.moviereviews.utils.FirestoreSeeder
 import com.example.moviereviews.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -15,7 +17,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val articleRepository: ArticleRepository,
-    private val firestoreSeeder: FirestoreSeeder
+    private val firestoreSeederProvider: Provider<FirestoreSeeder>
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
@@ -48,7 +50,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun seedDemoData() {
-        if (_uiState.value.isSeeding) {
+        if (!BackendConfig.isFirestore || _uiState.value.isSeeding) {
             return
         }
 
@@ -56,7 +58,7 @@ class HomeViewModel @Inject constructor(
             _uiState.update { it.copy(isSeeding = true, error = null) }
 
             try {
-                firestoreSeeder.seed()
+                firestoreSeederProvider.get().seed()
                 _uiState.update { it.copy(isSeeding = false) }
                 loadArticles()
             } catch (e: Exception) {

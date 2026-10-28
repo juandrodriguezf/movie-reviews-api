@@ -3,7 +3,19 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.google.services)
+}
+
+val backend = (project.findProperty("backend") as String?)?.lowercase() ?: "firestore"
+
+require(backend == "express" || backend == "firestore") {
+    "Backend invalido: $backend. Usa -Pbackend=express o -Pbackend=firestore."
+}
+
+if (backend == "firestore") {
+    if (!file("google-services.json").exists()) {
+        throw GradleException("Falta android/app/google-services.json para el backend Firestore.")
+    }
+    apply(plugin = "com.google.gms.google-services")
 }
 
 android {
@@ -18,6 +30,7 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "BACKEND", "\"$backend\"")
     }
 
     buildTypes {

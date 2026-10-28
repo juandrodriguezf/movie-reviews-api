@@ -52,6 +52,7 @@ import coil.compose.AsyncImage
 import com.example.moviereviews.data.model.ArticleSummaryInfo
 import com.example.moviereviews.data.model.ReviewInfo
 import com.example.moviereviews.data.model.UserInfo
+import com.example.moviereviews.utils.BackendConfig
 
 private val StarColor = Color(0xFFF5A623)
 
@@ -122,7 +123,7 @@ fun ProfileScreen(
                     }
                 },
                 actions = {
-                    if (viewModel.isOwnProfile) {
+                    if (viewModel.isOwnProfile && BackendConfig.isFirestore) {
                         TextButton(onClick = viewModel::logout) {
                             Text("Salir")
                         }

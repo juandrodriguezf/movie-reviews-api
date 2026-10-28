@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.moviereviews.BuildConfig
 import com.example.moviereviews.data.model.ArticleInfo
+import com.example.moviereviews.utils.BackendConfig
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -252,7 +253,7 @@ private fun EmptyState(
             style = MaterialTheme.typography.bodyLarge
         )
 
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG && BackendConfig.isFirestore) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
