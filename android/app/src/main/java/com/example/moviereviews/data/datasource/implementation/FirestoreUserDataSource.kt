@@ -56,4 +56,41 @@ class FirestoreUserDataSource @Inject constructor(
 
         return getUser(user.id)
     }
+
+    override suspend fun updateUserProfile(user: UserDto): UserDto {
+        val userRef = firestore.collection("users").document(user.id)
+        val reviews = firestore.collection("reviews")
+            .whereEqualTo("userId", user.id)
+            .get()
+            .await()
+
+        val batch = firestore.batch()
+
+        batch.update(
+            userRef,
+            mapOf(
+                "username" to user.username,
+                "name" to user.name,
+                "avatarUrl" to user.avatarUrl,
+                "bio" to user.bio,
+                "mainArticleId" to user.mainArticleId,
+                "updatedAt" to FieldValue.serverTimestamp()
+            )
+        )
+
+        val reviewUser = mapOf(
+            "id" to user.id,
+            "name" to user.name,
+            "username" to user.username,
+            "avatarUrl" to user.avatarUrl
+        )
+
+        reviews.documents.forEach { review ->
+            batch.update(review.reference, "user", reviewUser)
+        }
+
+        batch.commit().await()
+
+        return getUser(user.id)
+    }
 }

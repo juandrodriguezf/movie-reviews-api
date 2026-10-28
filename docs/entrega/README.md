@@ -1,11 +1,26 @@
-# Entrega Semana 10 - Movie Reviews
+# Entrega Semana 11 - Movie Reviews
 
-Aplicación Android en Kotlin + Jetpack Compose que consume la API REST de
-`backend/` para listar películas, consultar su detalle y administrar reseñas.
-El usuario autenticado está fijo en `id = 1` (`utils/Constants.kt`); no se usa
-Firebase Auth.
+Aplicación Android en Kotlin + Jetpack Compose que conserva la API REST de
+`backend/` (Semana 10) y agrega Firebase Auth + Firestore (Semana 11). El
+backend se elige al compilar: `-Pbackend=firestore` o `-Pbackend=express`.
 
 ## Cómo ejecutar
+
+### Modo Firestore
+
+1. Guardar el `google-services.json` real en `android/app/google-services.json`.
+2. En Firebase Console, habilitar Authentication (Email/Password) y Firestore.
+3. Compilar:
+
+   ```powershell
+   cd android
+   .\gradlew.bat :app:assembleDebug -Pbackend=firestore
+   ```
+
+4. Instalar y abrir. La app arranca en Login.
+5. Si Firestore está vacío, usar **Cargar datos de ejemplo** en Home (solo debug).
+
+### Modo Express
 
 1. Levantar PostgreSQL y el backend:
 
@@ -15,87 +30,142 @@ Firebase Auth.
    npm run def
    ```
 
-2. Crear el puente entre el equipo y el emulador:
+2. Crear el puente:
 
    ```powershell
    adb reverse tcp:3000 tcp:3000
    ```
 
-3. Abrir `android/` en Android Studio, ejecutar el sync y correr la app.
-
-   La URL base es `http://127.0.0.1:3000/`. Si se reinicia `adb`, hay que
-   repetir el comando de `adb reverse`.
-
-4. Compilar por consola:
+3. Compilar:
 
    ```powershell
    cd android
-   .\gradlew.bat assembleDebug
+   .\gradlew.bat :app:assembleDebug -Pbackend=express
    ```
 
-   APK: `android/app/build/outputs/apk/debug/app-debug.apk`.
+4. Instalar y abrir. La app arranca en Home sin login; el usuario actual es
+   `id = 1`.
 
-## Mapeo de la rúbrica
+## Funcionalidades Semana 11
+
+| Funcionalidad | Estado | Implementación |
+|---|---|---|
+| Registrar usuario guardando su información en Firestore | OK | `RegisterViewModel`, `AuthRepository` y `FirestoreUserDataSource.createUserProfile`. Crea `users/{uid}`. |
+| Ver mi perfil | OK | `profile/me`; `ProfileViewModel` usa el UID de Auth o `id = 1` en Express. |
+| Modificar mi perfil | OK | `EditProfileScreen` en `profile/edit`: nombre, username, bio, avatar y artículo principal. Actualiza `users/{uid}` y las copias de `user` en `reviews`. |
+| Ver el perfil de cualquier otro usuario | OK | Ruta `profile/{userId}`, abierta desde el autor de una reseña. |
+| Leer su artículo principal | OK | `ProfileViewModel` carga `mainArticleId` y `ProfileScreen` muestra la tarjeta “Artículo principal” en el perfil propio y ajeno. |
+| Ver todos los artículos | OK | `HomeScreen` y `GET /articles` o colección `articles`. |
+| Ver las reseñas de un artículo | OK | `ArticleDetailScreen` y `GET /articles/:id/reviews` o `whereEqualTo("articleId", id)`. |
+| Ver el detalle de un artículo | OK | `ArticleDetailScreen` con imagen, ficha y puntaje. |
+| Escribir una reseña | OK | `ReviewFormScreen`; crea en Firestore o con `POST /reviews`. |
+
+## Autenticación con Firebase
+
+- Registro con email/contraseña en `AuthRemoteDataSource`.
+- El UID de Auth es el ID del documento `users/{uid}`.
+- Antes de crear la cuenta se valida que el `username` no exista.
+- Si falla la creación del perfil, se cierra la sesión recién creada.
+- `SessionGate` muestra Login/Register hasta que `FirebaseAuth` tenga usuario.
+- Cerrar sesión está disponible en el perfil propio, solo en modo Firestore.
+
+## Modelo Firestore
+
+```text
+users/{uid}
+  id, username, email, name, avatarUrl, bio, mainArticleId, createdAt, updatedAt
+
+articles/{articleId}
+  id, title, director, genre, releaseYear, synopsis, duration, score, imageUrl
+
+reviews/{reviewId}
+  id, rating, comment, userId, articleId, createdAt, updatedAt
+  user: { id, name, username, avatarUrl }
+  article: { id, title, imageUrl }
+```
+
+Se desnormalizan `user` y `article` dentro de cada reseña para mostrarla sin
+lecturas adicionales. El mapeo se hace de forma manual desde `DocumentSnapshot`
+en `FirestoreMappers.kt`, usando `doc.id` y convirtiendo `Timestamp`.
+
+Reglas recomendadas para desarrollo:
+
+```js
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+```
+
+## Doble backend
+
+- `BuildConfig.BACKEND` se genera desde `-Pbackend=express|firestore`.
+- `BackendConfig` decide qué implementación de `RemoteDataSource` se inyecta.
+- `AppModule` usa `Provider` para no inicializar Firestore en modo Express ni
+  Retrofit en modo Firestore.
+- `CurrentUserProvider` devuelve `"1"` en Express y el UID de Auth en Firestore.
+- `SessionGate` se omite en Express.
+- `google-services` solo se aplica en modo Firestore.
+- Los IDs de la UI son `String`. `NumericStringTypeAdapter` convierte los IDs
+  numéricos de Express; `RetrofitReviewRequestDto` los vuelve a convertir a
+  `Int` al crear o actualizar una reseña.
+
+## Estructura
+
+```text
+screens/
+  auth/
+  home/
+  article/
+  profile/
+  review/
+data/datasource/
+  implementation/Firestore*.kt
+  implementation/Retrofit*.kt
+  services/MovieReviewsService.kt
+data/dto/
+data/model/
+data/repository/
+injection/
+  AppModule.kt
+  FirebaseHiltModule.kt
+navigation/
+utils/
+docs/entrega/
+```
+
+## Semana 10 - Modo Express
+
+El modo Express conserva la entrega anterior:
 
 | Criterio | Puntos | Evidencia | Implementación |
 |---|---:|---|---|
-| Home con artículos | 1.0 | [01-home](../img/01-home.png) | `HomeScreen`, `HomeViewModel` y `GET /articles`. Grilla de dos columnas con portada, puntaje, título, director y año. |
-| Detalle del artículo | 0.5 | [02-detalle](../img/02-detalle.png) | `ArticleDetailScreen` y `ArticleDetailViewModel` con `GET /articles/:id`: imagen, título, director, género, duración, sinopsis y puntaje. |
-| Ver comentarios | 0.5 | [02-detalle](../img/02-detalle.png) | Reseñas del detalle con `GET /articles/:id/reviews`: autor, avatar, calificación en estrellas y comentario. |
-| Mi perfil | 0.5 | [05-mi-perfil](../img/05-mi-perfil.png) | `ProfileScreen` en la ruta `profile/me`: usuario actual, correo y solo sus reseñas (`GET /users/1/reviews`). |
-| Perfil de otro usuario | 1.0 | [04-perfil-otro](../img/04-perfil-otro.png) | Ruta `profile/{userId}`. Se abre al tocar el autor de una reseña; muestra sus datos y sus reseñas (`GET /users/:id` y `GET /users/:id/reviews`). |
-| CRUD de reseñas | 1.5 | [08-crear](../img/08-crear.png), [06-editar](../img/06-editar.png), [07-eliminar](../img/07-eliminar.png) | Formulario compartido para crear y editar (`ReviewFormScreen`, `ReviewFormViewModel`), usando `POST /reviews` y `PUT /reviews/:id`. Eliminación con confirmación desde detalle y perfil con `DELETE /reviews/:id`. Solo se permite editar o eliminar la reseña propia. |
+| Home con artículos | 1.0 | [01-home](../img/01-home.png) | `HomeScreen`, `HomeViewModel` y `GET /articles`. |
+| Detalle del artículo | 0.5 | [02-detalle](../img/02-detalle.png) | `ArticleDetailScreen` y `GET /articles/:id`. |
+| Ver comentarios | 0.5 | [02-detalle](../img/02-detalle.png) | `GET /articles/:id/reviews`. |
+| Mi perfil | 0.5 | [05-mi-perfil](../img/05-mi-perfil.png) | `profile/me` y `GET /users/1/reviews`. |
+| Perfil de otro usuario | 1.0 | [04-perfil-otro](../img/04-perfil-otro.png) | `profile/{userId}`, `GET /users/:id` y `GET /users/:id/reviews`. |
+| CRUD de reseñas | 1.5 | [08-crear](../img/08-crear.png), [06-editar](../img/06-editar.png), [07-eliminar](../img/07-eliminar.png) | `ReviewFormScreen`, `POST /reviews`, `PUT /reviews/:id` y `DELETE /reviews/:id`. |
 
-## Flujo de la app
-
-1. **Home:** lista todas las películas. El botón `Perfil` abre el perfil propio.
-2. **Detalle:** muestra la ficha y las reseñas. Si el usuario actual no ha
-   reseñado la película, aparece `Escribir reseña`. Si ya la reseñó, su tarjeta
-   muestra `Editar` y `Eliminar`.
-3. **Formulario:** selecciona de 1 a 5 estrellas, escribe un comentario de
-   máximo 500 caracteres y guarda. Al volver, el detalle o el perfil se
-   actualiza automáticamente.
-4. **Perfil propio:** muestra solo las reseñas del usuario actual y permite
-   editarlas o eliminarlas.
-5. **Perfil ajeno:** se llega tocando el autor de una reseña. Muestra sus datos
-   y sus reseñas, sin acciones de edición.
-
-## Rutas
+### Rutas
 
 ```text
 home
 article/{articleId}
 profile/me
+profile/edit
 profile/{userId}
 review/form?articleId={articleId}&reviewId={reviewId}
 ```
 
-`reviewId = -1` significa que el formulario está creando una reseña; un valor
-mayor que cero indica que está editando.
+`reviewId = ""` indica que se está creando una reseña; un ID con valor indica
+que se está editando.
 
-## Arquitectura
-
-```text
-screens/
-data/dto/
-data/model/
-data/datasource/
-data/datasource/services/
-data/datasource/implementation/
-data/repository/
-injection/AppModule.kt
-navigation/
-utils/
-```
-
-- **UI:** Jetpack Compose + Navigation Compose + ViewModel + `UiState`.
-- **DI:** Hilt con KSP.
-- **Red:** Retrofit + Gson + OkHttp Logging.
-- **Imágenes:** Coil.
-- **Errores:** `Result` y `apiCall` en `utils/Result.kt`, sin exponer DTOs a la UI.
-- **Modelos:** los DTOs se mapean a `*Info` en la capa de datos.
-
-## Endpoints consumidos
+### Endpoints consumidos en Express
 
 | Método | Endpoint | Uso |
 |---|---|---|
@@ -109,21 +179,19 @@ utils/
 | PUT | `/reviews/:id` | Editar reseña |
 | DELETE | `/reviews/:id` | Eliminar reseña |
 
-## Pruebas realizadas
+## Evidencias
 
-- `assembleDebug` finaliza correctamente.
-- Crear reseña desde el detalle y ver el nuevo comentario al volver.
-- Editar desde detalle y desde `Mi perfil`, verificando el cambio de estrellas.
-- Eliminar desde detalle y desde `Mi perfil`, con diálogo de confirmación.
-- El backend responde `201` al crear y `200` al actualizar/eliminar.
-- Se restauró la base con `npm run def` después de las pruebas.
-- Sin `FATAL EXCEPTION` en el logcat del emulador.
+- Semana 10: capturas en `docs/img/` para Home, detalle, perfiles y CRUD.
+- Semana 11: pendiente agregar capturas de Login, registro, seed y perfil
+  cargado desde Firestore.
 
 ## Notas
 
-- `adb reverse` se usa porque el emulador de este equipo no alcanza
-  `10.0.2.2:3000` de forma estable; `127.0.0.1` funciona igual en emulador y
-  dispositivo físico.
-- El tráfico HTTP sin cifrar está limitado a `127.0.0.1` y `10.0.2.2` en
-  `res/xml/network_security_config.xml`.
-- Las capturas fueron tomadas en el emulador `Pixel_7` con el backend local.
+- El mismo `applicationId` se usa en ambos modos; para cambiar de backend hay
+  que recompilar e instalar. No se pueden tener las dos variantes instaladas a
+  la vez.
+- `google-services.json` está ignorado por Git. Solo es necesario en Firestore.
+- Los usuarios de Firebase Auth empiezan sin reseñas; las reseñas del seed
+  pertenecen a los usuarios `seed-*`.
+- La edición de perfil solo está disponible en modo Firestore; en Express el
+  usuario actual es fijo (`id = 1`).

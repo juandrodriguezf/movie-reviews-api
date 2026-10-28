@@ -14,6 +14,8 @@ sealed class Screen(val route: String) {
 
     data object MyProfile : Screen("profile/me")
 
+    data object EditProfile : Screen("profile/edit")
+
     data object UserProfile : Screen("profile/{userId}") {
         const val ARG_USER_ID = "userId"
 

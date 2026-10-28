@@ -3,6 +3,8 @@ package com.example.moviereviews.screens.profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.moviereviews.data.model.ArticleInfo
+import com.example.moviereviews.data.repository.ArticleRepository
 import com.example.moviereviews.data.repository.AuthRepository
 import com.example.moviereviews.data.repository.ReviewRepository
 import com.example.moviereviews.data.repository.UserRepository
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
+    private val articleRepository: ArticleRepository,
     private val authRepositoryProvider: Provider<AuthRepository>,
     currentUserProvider: CurrentUserProvider,
     savedStateHandle: SavedStateHandle
@@ -57,11 +60,14 @@ class ProfileViewModel @Inject constructor(
                 }
 
                 is Result.Success -> {
+                    val mainArticle = loadMainArticle(userResult.data.mainArticleId)
+
                     when (val reviewsResult = userRepository.getUserReviews(userId)) {
                         is Result.Success -> _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 user = userResult.data,
+                                mainArticle = mainArticle,
                                 reviews = reviewsResult.data,
                                 error = null,
                                 reviewsError = null
@@ -72,6 +78,7 @@ class ProfileViewModel @Inject constructor(
                             it.copy(
                                 isLoading = false,
                                 user = userResult.data,
+                                mainArticle = mainArticle,
                                 reviews = emptyList(),
                                 error = null,
                                 reviewsError = reviewsResult.message
@@ -80,6 +87,17 @@ class ProfileViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun loadMainArticle(articleId: String?): ArticleInfo? {
+        if (articleId.isNullOrBlank()) {
+            return null
+        }
+
+        return when (val result = articleRepository.getArticle(articleId)) {
+            is Result.Success -> result.data
+            is Result.Failure -> null
         }
     }
 

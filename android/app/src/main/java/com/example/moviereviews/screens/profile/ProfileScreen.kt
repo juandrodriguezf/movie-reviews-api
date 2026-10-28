@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -49,6 +50,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.moviereviews.data.model.ArticleInfo
 import com.example.moviereviews.data.model.ArticleSummaryInfo
 import com.example.moviereviews.data.model.ReviewInfo
 import com.example.moviereviews.data.model.UserInfo
@@ -62,6 +64,7 @@ fun ProfileScreen(
     onBack: () -> Unit,
     onArticleClick: (String) -> Unit,
     onEditReview: (String, String) -> Unit,
+    onEditProfile: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -124,6 +127,10 @@ fun ProfileScreen(
                 },
                 actions = {
                     if (viewModel.isOwnProfile && BackendConfig.isFirestore) {
+                        TextButton(onClick = onEditProfile) {
+                            Text("Editar")
+                        }
+
                         TextButton(onClick = viewModel::logout) {
                             Text("Salir")
                         }
@@ -145,6 +152,7 @@ fun ProfileScreen(
 
             user != null -> ProfileContent(
                 user = user,
+                mainArticle = uiState.mainArticle,
                 reviews = uiState.reviews,
                 reviewsError = uiState.reviewsError,
                 actionError = uiState.actionError,
@@ -163,6 +171,7 @@ fun ProfileScreen(
 @Composable
 private fun ProfileContent(
     user: UserInfo,
+    mainArticle: ArticleInfo?,
     reviews: List<ReviewInfo>,
     reviewsError: String?,
     actionError: String?,
@@ -178,6 +187,16 @@ private fun ProfileContent(
     ) {
         item {
             ProfileHeader(user = user, isOwnProfile = isOwnProfile)
+        }
+
+        if (mainArticle != null) {
+            item {
+                MainArticleCard(
+                    article = mainArticle,
+                    onClick = { onArticleClick(mainArticle.id) },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                )
+            }
         }
 
         item {
@@ -292,6 +311,17 @@ private fun ProfileHeader(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
+        if (user.bio.isNotBlank()) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = user.bio,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+
         if (isOwnProfile && user.email != null) {
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -300,6 +330,66 @@ private fun ProfileHeader(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@Composable
+private fun MainArticleCard(
+    article: ArticleInfo,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        )
+    ) {
+        Row(modifier = Modifier.padding(12.dp)) {
+            AsyncImage(
+                model = article.imageUrl,
+                contentDescription = article.title,
+                modifier = Modifier
+                    .size(width = 72.dp, height = 96.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Articulo principal",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = article.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "${article.director} · ${article.releaseYear}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }

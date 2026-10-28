@@ -46,4 +46,26 @@ class UserRepository @Inject constructor(
             )
         ).toUserInfo()
     }
+
+    suspend fun updateUserProfile(
+        uid: String,
+        name: String,
+        username: String,
+        email: String,
+        bio: String = "",
+        avatarUrl: String = "",
+        mainArticleId: String? = null
+    ): Result<UserInfo> = apiCall {
+        remoteDataSource.updateUserProfile(
+            UserDto(
+                id = uid,
+                username = username,
+                email = email,
+                name = name,
+                avatarUrl = avatarUrl,
+                bio = bio,
+                mainArticleId = mainArticleId
+            )
+        ).toUserInfo()
+    }
 }

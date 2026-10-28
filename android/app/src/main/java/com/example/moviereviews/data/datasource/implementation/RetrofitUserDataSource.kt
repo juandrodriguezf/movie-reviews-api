@@ -17,4 +17,7 @@ class RetrofitUserDataSource @Inject constructor(
 
     override suspend fun createUserProfile(user: UserDto): UserDto =
         throw UnsupportedOperationException("createUserProfile solo esta disponible con Firestore")
+
+    override suspend fun updateUserProfile(user: UserDto): UserDto =
+        throw UnsupportedOperationException("updateUserProfile solo esta disponible con Firestore")
 }

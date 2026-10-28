@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.example.moviereviews.screens.article.ArticleDetailScreen
 import com.example.moviereviews.screens.auth.SessionGate
 import com.example.moviereviews.screens.home.HomeScreen
+import com.example.moviereviews.screens.profile.EditProfileScreen
 import com.example.moviereviews.screens.profile.ProfileScreen
 import com.example.moviereviews.screens.review.ReviewFormScreen
 import com.example.moviereviews.utils.Constants
@@ -76,7 +77,17 @@ private fun AppNavHost(navController: NavHostController) {
                     navController.navigate(
                         Screen.ReviewForm.createRoute(articleId, reviewId)
                     )
+                },
+                onEditProfile = {
+                    navController.navigate(Screen.EditProfile.route)
                 }
+            )
+        }
+
+        composable(Screen.EditProfile.route) {
+            EditProfileScreen(
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() }
             )
         }
 
@@ -97,6 +108,9 @@ private fun AppNavHost(navController: NavHostController) {
                     navController.navigate(
                         Screen.ReviewForm.createRoute(articleId, reviewId)
                     )
+                },
+                onEditProfile = {
+                    navController.navigate(Screen.EditProfile.route)
                 }
             )
         }

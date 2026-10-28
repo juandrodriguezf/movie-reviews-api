@@ -8,4 +8,5 @@ interface UserRemoteDataSource {
     suspend fun getUserReviews(id: String): List<ReviewDto>
     suspend fun usernameExists(username: String): Boolean
     suspend fun createUserProfile(user: UserDto): UserDto
+    suspend fun updateUserProfile(user: UserDto): UserDto
 }
