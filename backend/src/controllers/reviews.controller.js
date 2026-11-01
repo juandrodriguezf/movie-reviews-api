@@ -86,7 +86,7 @@ export const deleteReview = async (req, res) => {
     }
 
     await review.destroy();
-    res.sendStatus(204);
+    res.status(200).json({ message: 'Resena eliminada correctamente' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al eliminar la resena' });

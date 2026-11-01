@@ -202,8 +202,20 @@
               "host": ["{{baseUrl}}"],
               "path": ["reviews", "{{reviewId}}"]
             },
-            "description": "Elimina una resena. Responde 204."
+            "description": "Elimina una resena. Responde 200 con un mensaje de confirmacion."
           },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Mensaje de confirmacion', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "response": []
         }
       ]
